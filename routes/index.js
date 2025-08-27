@@ -1,23 +1,24 @@
-import express from 'express';
-import { register } from '../controllers/authController.js';
+// ... importaciones existentes ...
 import { body } from 'express-validator';
-import { findUserByEmail } from '../models/userModel.js';
+import { authenticateJWT, isAdmin } from '../middlewares/authMiddleware.js';
+import { upload } from '../utils/cloudinary.js'; // Para upload de imagen
+import {
+  createMovieController,
+  getMoviesController,
+  getMovieByIdController,
+  updateMovieController,
+  deleteMovieController,
+  addReviewController
+} from '../controllers/movieController.js';
 
-const router = express.Router();
+// Rutas públicas
+router.get('/movies', getMoviesController); // Listado básico
+router.get('/movies/:id', getMovieByIdController); // Detalle (público o protegido? Haz protegido para reseñas completas)
 
-router.post(
-  '/register',
-  [
-    body('email').isEmail().withMessage('Debe ser un email válido'),
-    body('email').custom(async (value) => {
-      const user = await findUserByEmail(value);
-      if (user) {
-        throw new Error('El email ya está registrado');
-      }
-    }),
-    body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-  ],
-  register
-);
+// Rutas protegidas
+router.post('/movies', authenticateJWT, isAdmin, upload.single('image'), [body('title').notEmpty(), body('description').notEmpty(), body('category').notEmpty(), body('year').isInt()], createMovieController);
+router.put('/movies/:id', authenticateJWT, isAdmin, upload.single('image'), [body('title').notEmpty()], updateMovieController);
+router.delete('/movies/:id', authenticateJWT, isAdmin, deleteMovieController);
 
-export default router;
+// Reseñas (protegidas)
+router.post('/movies/:id/reviews', authenticateJWT, [body('title').notEmpty(), body('comment').notEmpty(), body('rating').isInt({ min: 1, max: 10 })], addReviewController);

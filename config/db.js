@@ -4,15 +4,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const uri = process.env.MONGODB_URI;
-export const client = new MongoClient(uri);
+const client = new MongoClient(uri);
 
 export const connectDB = async () => {
   try {
     await client.connect();
-    console.log('Conectado a MongoDB');
-    return client.db('FreakHub');
+    return client.db(); // Devuelve la base de datos (usa 'geek_rating' como nombre por defecto)
   } catch (error) {
     console.error('Error conectando a MongoDB:', error);
-    process.exit(1);
+    throw error; // Propaga el error para manejarlo en index.js
   }
 };
+
+export const getDB = () => client.db(); // Para usar en otros archivos si necesario
