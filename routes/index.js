@@ -1,7 +1,9 @@
 import express from 'express';
 import { register, login } from '../controllers/authController.js';
+import { getProfile, updatePassword, addUserReview, addUserRating } from '../controllers/profileController.js';
 import { body } from 'express-validator';
 import { findUserByEmail } from '../models/userModel.js';
+import passport from '../config/passport.js';
 
 const router = express.Router();
 
@@ -29,5 +31,21 @@ router.post(
   ],
   login
 );
+
+router.get('/profile', passport.authenticate('jwt', { session: false }), getProfile);
+
+router.put(
+  '/profile/password',
+  [
+    body('currentPassword').notEmpty().withMessage('La contraseña actual es requerida'),
+    body('newPassword').isLength({ min: 6 }).withMessage('La nueva contraseña debe tener al menos 6 caracteres'),
+  ],
+  passport.authenticate('jwt', { session: false }),
+  updatePassword
+);
+
+router.post('/profile/review', passport.authenticate('jwt', { session: false }), addUserReview);
+
+router.post('/profile/rating', passport.authenticate('jwt', { session: false }), addUserRating);
 
 export default router;
