@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { findUserByEmail } from '../models/userModel.js';
+import { createUser, findUserByEmail } from '../models/userModel.js';
 
 export const register = async (req, res) => {
   const errors = validationResult(req);
@@ -9,7 +9,7 @@ export const register = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password } = req.body;
+  const { email, password, username } = req.body;
 
   const existingUser = await findUserByEmail(email);
   if (existingUser) {
@@ -20,6 +20,7 @@ export const register = async (req, res) => {
   const user = {
     email,
     password: hashedPassword,
+    username,
     role: 'usuario',
     createdAt: new Date(),
   };
