@@ -1,5 +1,5 @@
 import express from 'express';
-import { register } from '../controllers/authController.js';
+import { register, login } from '../controllers/authController.js';
 import { body } from 'express-validator';
 import { findUserByEmail } from '../models/userModel.js';
 
@@ -18,6 +18,15 @@ router.post(
     body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
   ],
   register
+);
+
+router.post(
+  '/login',
+  [
+    body('email').isEmail().withMessage('Debe ser un email válido'),
+    body('password').notEmpty().withMessage('La contraseña es requerida'),
+  ],
+  login
 );
 
 export default router;
