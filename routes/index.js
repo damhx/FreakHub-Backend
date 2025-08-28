@@ -1,9 +1,11 @@
 import express from 'express';
 import { register, login } from '../controllers/authController.js';
 import { getProfile, updatePassword, addUserReview, addUserRating } from '../controllers/profileController.js';
+import { propose, approve, reject } from '../controllers/movieController.js';
 import { body } from 'express-validator';
 import { findUserByEmail } from '../models/userModel.js';
 import passport from '../config/passport.js';
+import { authenticateJWT, isAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -47,5 +49,30 @@ router.put(
 router.post('/profile/review', passport.authenticate('jwt', { session: false }), addUserReview);
 
 router.post('/profile/rating', passport.authenticate('jwt', { session: false }), addUserRating);
+
+// Nuevas rutas para películas
+router.post(
+  '/movies',
+  authenticateJWT,
+  [
+    body('title').notEmpty().withMessage('El título es requerido'),
+    body('categoryId').notEmpty().withMessage('La categoría es requerida'),
+  ],
+  propose
+);
+
+router.post(
+  '/movies/:movieId/approve',
+  authenticateJWT,
+  isAdmin,
+  approve
+);
+
+router.post(
+  '/movies/:movieId/reject',
+  authenticateJWT,
+  isAdmin,
+  reject
+);
 
 export default router;
