@@ -30,9 +30,9 @@ export const createMovie = async (movieData) => {
 };
 
 // Función para obtener todas las películas (con filtro opcional)
-export const getMovies = async (filter = {}) => {
+export const getMovies = async (/* filter = { status: 'aceptada' } */) => {
   const db = await connectDB();
-  return await db.collection('peliculas').find(filter).toArray();
+  return await db.collection('peliculas').find({status: 'aceptada'}).toArray(); //solo peliculas aceptadas
 };
 
 // Función para obtener una película por ID
@@ -51,6 +51,7 @@ export const updateMovie = async (id, movieData) => {
       title: movieData.title,
       description: movieData.description,
       category: movieData.category,
+      status: movieData.status,
       year: movieData.year,
       image: movieData.image,
       updatedAt: new Date()
@@ -125,6 +126,30 @@ export const addReview = async (movieId, reviewData, userId) => {
   } catch (error) {
     await session.abortTransaction();
     throw new Error('Error añadiendo reseña: ' + error.message);
+  } finally {
+    session.endSession();
+  }
+};
+
+
+
+// Función para aprobar una película (cambiar status a 'aceptada')
+export const approveMovie = async (id) => {
+  const db = await connectDB();
+  const session = db.client.startSession();
+  try {
+    session.startTransaction();
+    const result = await db.collection('peliculas').updateOne(
+      { _id: new ObjectId(id), status: 'pendiente' },
+      { $set: { status: 'aceptada', updatedAt: new Date() } },
+      { session }
+    );
+    await session.commitTransaction();
+    if (result.matchedCount === 0) throw new Error('Película no encontrada o ya aprobada');
+    return true;
+  } catch (error) {
+    await session.abortTransaction();
+    throw new Error('Error aprobando película: ' + error.message);
   } finally {
     session.endSession();
   }
