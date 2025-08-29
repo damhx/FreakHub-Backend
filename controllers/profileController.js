@@ -39,22 +39,3 @@ export const updatePassword = async (req, res) => {
   await updateUserPassword(userId, newPassword);
   res.json({ message: 'Contraseña actualizada exitosamente' });
 };
-
-export const addUserReview = async (req, res) => {
-  const userId = req.user._id;
-  const { content, movieId } = req.body;
-  const review = { content, movieId, createdAt: new Date() };
-  await addReview(userId, review);
-  res.json({ message: 'Reseña añadida exitosamente', review });
-};
-
-export const addUserRating = async (req, res) => {
-  const userId = req.user._id;
-  const { movieId, rating } = req.body;
-  if (rating < 1 || rating > 10) {
-    return res.status(400).json({ message: 'El rating debe estar entre 1 y 10' });
-  }
-  const ratingDoc = { movieId, rating, createdAt: new Date() };
-  await addRating(userId, ratingDoc);
-  res.json({ message: 'Rating añadido exitosamente', rating: ratingDoc });
-};

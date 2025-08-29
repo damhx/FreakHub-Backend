@@ -1,6 +1,8 @@
 import { client } from '../config/db.js';
 import { ObjectId } from 'mongodb';
+import { connectDB } from '../config/db.js';
 
+// agregue reviews en user para guardar el historial de las reviews
 export const createUser = async (userData) => {
   const db = await connectDB();
   const usersCollection = db.collection('users');
@@ -8,9 +10,10 @@ export const createUser = async (userData) => {
     ...userData,
     role: userData.role || 'usuario',
     reviews: [], 
-    createdAt: new Date()
-  });
+    createdAt: new Date()
+  });
 };
+
 
 export const findUserByEmail = async (email) => {
   const db = client.db('FreakHub');

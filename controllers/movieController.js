@@ -1,44 +1,133 @@
 import { validationResult } from 'express-validator';
-import { proposeMovie, approveMovie, rejectMovie } from '../models/movieModel.js';
+import { createMovie, getMovies,getMoviesPending, getMovieById, updateMovie, deleteMovie, addReview, approveMovie } from '../models/movieModel.js';
+import { uploadImage } from '../utils/cloudinary.js'; // Asumiendo que lo creaste
+import {categoryExists} from '../models/categoryModel.js'
 
-export const propose = async (req, res) => {
+export const getMoviesController = async (req, res) => {
+  try {
+    const filter = req.query.category ? { category: req.query.category } : {};
+    const movies = await getMovies(filter);
+    res.json(movies);
+  } catch (error) {
+    res.status(500).json({ message: 'Error obteasdasdsadniendo películas', error: error.message });
+  }
+};
+
+export const getMovieByIdController = async (req, res) => {
+  try {
+    const movie = await getMovieById(req.params.id);
+    if (!movie) return res.status(404).json({ message: 'Película no encontrada' });
+    res.json(movie);
+  } catch (error) {
+    res.status(500).json({ message: ' película', error: error.message });
+  }
+};
+export const getPendingMoviesController = async (req, res) => {
+  try {
+    const movies = await getMoviesPending({ status: 'pendiente' });
+    res.json(movies);
+  } catch (error) {
+    res.status(500).json({ message: 'asdasd', error: error.message });
+  }
+};
+export const updateMovieController = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const movieData = {
-    title: req.body.title,
-    desc: req.body.desc,
-    categoryId: req.body.categoryId,
-    year: req.body.year,
-    image: req.body.image,
-  };
-
   try {
-    const result = await proposeMovie(movieData);
-    res.status(201).json({ message: 'Película propuesta exitosamente', result });
+    let imageUrl = req.body.image; // Mantener existente si no se sube nueva
+    let status = req.body.status
+    let description = req.body.description
+    let category = req.body.category
+    let year = parseInt(req.body.year)
+    if (req.file) {
+      imageUrl = await uploadImage(req.file.buffer);
+    }
+
+    const movieData = {
+      title: req.body.title,
+      description: description,
+      category: category,
+      status: status,
+      year: year,
+      image: imageUrl
+    };
+
+    const updatedMovie = await updateMovie(req.params.id, movieData);
+    res.json(updatedMovie);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: 'Error actualizando película', error: error.message });
   }
 };
 
-export const approve = async (req, res) => {
-  const { movieId } = req.params;
+export const deleteMovieController = async (req, res) => {
   try {
-    await approveMovie(movieId);
-    res.json({ message: 'Película aprobada' });
+    await deleteMovie(req.params.id);
+    res.json({ message: 'Película eliminada' });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: 'Error eliminando película', error: error.message });
   }
 };
 
-export const reject = async (req, res) => {
-  const { movieId } = req.params;
+export const addReviewController = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
-    await rejectMovie(movieId);
-    res.json({ message: 'Película rechazada' });
+    const reviewData = {
+      title: req.body.title,
+      comment: req.body.comment,
+      rating: parseInt(req.body.rating)
+    };
+    const review = await addReview(req.params.id, reviewData, req.user._id); // req.user de JWT
+    res.status(201).json(review);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: 'Error añadiendo reseña', error: error.message });
+  }
+};
+
+export const createMovieController = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const exists = await categoryExists(req.body.category);
+    if (!exists) return res.status(400).json({ message: 'Categoría no existe' });
+
+    let imageUrl = '';
+    if (req.file) {
+      imageUrl = await uploadImage(req.file.buffer);
+    }
+
+    const movieData = {
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category.toLowerCase(),
+      year: parseInt(req.body.year),
+      image: imageUrl,
+      creatorId: req.user._id
+    };
+
+    const movie = await createMovie(movieData);
+    res.status(201).json(movie);
+  } catch (error) {
+    res.status(500).json({ message: 'Error creando película', error: error.message });
+  }
+};
+
+
+
+export const approveMovieController = async (req, res) => {
+  try {
+    await approveMovie(req.params.id);
+    res.json({ message: 'Película aprobada exitosamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error aprobando película', error: error.message });
   }
 };
