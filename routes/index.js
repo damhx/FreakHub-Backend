@@ -1,18 +1,11 @@
 // ... importaciones existentes ...
 import express from 'express';
 import { register, login, verifyAccount } from '../controllers/authController.js'; // Agregué verifyAccount
-import { getProfile, updatePassword, addUserReview, addUserRating } from '../controllers/profileController.js';
-import { propose, approve, reject } from '../controllers/movieController.js';
 import { body } from 'express-validator';
 import { findUserByEmail } from '../models/userModel.js';
 import passport from '../config/passport.js';
 import { authenticateJWT, isAdmin } from '../middlewares/authMiddleware.js';
-import { register, login } from '../controllers/authController.js';
 import { getProfile, updatePassword } from '../controllers/profileController.js';
-import { findUserByEmail } from '../models/userModel.js';
-import passport from '../config/passport.js';
-import { body } from 'express-validator';
- import { authenticateJWT, isAdmin } from '../middlewares/authMiddleware.js';
  import { upload } from '../utils/cloudinary.js'; // Para upload de imagen
 
  //import movies
