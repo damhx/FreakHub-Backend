@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator';
-import { createMovie, getMovies, getMovieById, updateMovie, deleteMovie, addReview, approveMovie } from '../models/movieModel.js';
+import { createMovie, getMovies,getMoviesPending, getMovieById, updateMovie, deleteMovie, addReview, approveMovie } from '../models/movieModel.js';
 import { uploadImage } from '../utils/cloudinary.js'; // Asumiendo que lo creaste
-
+import {categoryExists} from '../models/categoryModel.js'
 
 export const getMoviesController = async (req, res) => {
   try {
@@ -9,7 +9,7 @@ export const getMoviesController = async (req, res) => {
     const movies = await getMovies(filter);
     res.json(movies);
   } catch (error) {
-    res.status(500).json({ message: 'Error obteniendo películas', error: error.message });
+    res.status(500).json({ message: 'Error obteasdasdsadniendo películas', error: error.message });
   }
 };
 
@@ -19,10 +19,17 @@ export const getMovieByIdController = async (req, res) => {
     if (!movie) return res.status(404).json({ message: 'Película no encontrada' });
     res.json(movie);
   } catch (error) {
-    res.status(500).json({ message: 'Error obteniendo película', error: error.message });
+    res.status(500).json({ message: ' película', error: error.message });
   }
 };
-
+export const getPendingMoviesController = async (req, res) => {
+  try {
+    const movies = await getMoviesPending({ status: 'pendiente' });
+    res.json(movies);
+  } catch (error) {
+    res.status(500).json({ message: 'asdasd', error: error.message });
+  }
+};
 export const updateMovieController = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -90,6 +97,9 @@ export const createMovieController = async (req, res) => {
   }
 
   try {
+    const exists = await categoryExists(req.body.category);
+    if (!exists) return res.status(400).json({ message: 'Categoría no existe' });
+
     let imageUrl = '';
     if (req.file) {
       imageUrl = await uploadImage(req.file.buffer);
@@ -98,10 +108,10 @@ export const createMovieController = async (req, res) => {
     const movieData = {
       title: req.body.title,
       description: req.body.description,
-      category: req.body.category,
+      category: req.body.category.toLowerCase(),
       year: parseInt(req.body.year),
       image: imageUrl,
-      creatorId: req.user._id // Para saber quién propuso
+      creatorId: req.user._id
     };
 
     const movie = await createMovie(movieData);
@@ -111,14 +121,7 @@ export const createMovieController = async (req, res) => {
   }
 };
 
-export const getPendingMoviesController = async (req, res) => {
-  try {
-    const movies = await getMovies({ status: 'pendiente' });
-    res.json(movies);
-  } catch (error) {
-    res.status(500).json({ message: 'Error obteniendo películas pendientes', error: error.message });
-  }
-};
+
 
 export const approveMovieController = async (req, res) => {
   try {

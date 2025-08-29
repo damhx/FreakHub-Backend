@@ -1,12 +1,14 @@
 // ... importaciones existentes ...
 import express from 'express';
 import { register, login } from '../controllers/authController.js';
-import { getProfile, updatePassword, addUserReview, addUserRating } from '../controllers/profileController.js';
+import { getProfile, updatePassword } from '../controllers/profileController.js';
 import { findUserByEmail } from '../models/userModel.js';
 import passport from '../config/passport.js';
 import { body } from 'express-validator';
  import { authenticateJWT, isAdmin } from '../middlewares/authMiddleware.js';
  import { upload } from '../utils/cloudinary.js'; // Para upload de imagen
+
+ //import movies
 import {
   createMovieController,
   getMoviesController,
@@ -18,6 +20,24 @@ import {
   approveMovieController
 } from '../controllers/movieController.js';
 
+//import category
+import { 
+  createCategoryController, 
+  getCategoriesController, 
+  getCategoryByIdController, 
+  updateCategoryController, 
+  deleteCategoryController 
+} from '../controllers/categoryController.js';
+
+//import reviews
+import { 
+  createReviewController, 
+  getReviewsByMovieController, 
+  likeReviewController, 
+  addCommentController, 
+  updateReviewController, 
+  deleteReviewController 
+} from '../controllers/reviewController.js';
 const router = express.Router();
 // rutas de login register y demas:
 
@@ -62,18 +82,12 @@ router.put(
   updatePassword
 );
 
-//accede a las reviews del usuario
-router.post('/profile/review', passport.authenticate('jwt', { session: false }), addUserReview);
-
-//accede a las calificaciones del usuario
-router.post('/profile/rating', passport.authenticate('jwt', { session: false }), addUserRating);
-
 
 
 // Rutas públicas
 router.get('/movies', getMoviesController); // Listado para usuarios, solo muestra movies aceptadas
-router.get('/movies/:id', getMovieByIdController); // Ir directamente a una pelicula (no se si deba ser pubico o protegido :()
-
+ router.get('/movies/get/:id', getMovieByIdController); // Ir directamente a una pelicula (no se si deba ser pubico o protegido :()
+  
 // Rutas protegidas
 
 
@@ -98,8 +112,45 @@ router.get('/movies/pending', authenticateJWT, isAdmin, getPendingMoviesControll
 //ruta para aprobar una pelicula(la idea es que en el frontEND solo se consuman las peliculas ocn el estado en aceptadas)
 router.put('/movies/:id/approve', authenticateJWT, isAdmin, approveMovieController);
 
-
 // Reseñas (protegidas)
-router.post('/movies/:id/reviews', authenticateJWT, [body('title').notEmpty(), body('comment').notEmpty(), body('rating').isInt({ min: 1, max: 10 })], addReviewController);
+/* router.post('/movies/:id/reviews', authenticateJWT, [body('title').notEmpty(), body('comment').notEmpty(), body('rating').isInt({ min: 1, max: 10 })], addReviewController);
+ */
 
+//CATEGORIAS
+// ver todas las categorias
+router.get('/categories', getCategoriesController); // Listado para todos (opciones disponibles)
+
+// Rutas admin
+//crear categorias
+router.post('/categories', authenticateJWT, isAdmin, [body('name').notEmpty().withMessage('Nombre requerido')], createCategoryController);
+
+//obtener categorias por id
+router.get('/categories/:id', authenticateJWT, isAdmin, getCategoryByIdController);
+
+//actualizar categorias por id
+router.put('/categories/:id', authenticateJWT, isAdmin, [body('name').notEmpty().withMessage('Nombre requerido')], updateCategoryController);
+
+//eliminar categorias por id 
+router.delete('/categories/:id', authenticateJWT, isAdmin, deleteCategoryController);
+
+//REVIEWS
+
+//crear una review
+router.post('/movies/create/:movieId/reviews', authenticateJWT, [body('title').notEmpty(), body('comment').notEmpty(), body('rating').isInt({ min: 1, max: 10 })], createReviewController);
+
+//listar reviews de una pelicula
+router.get('/movies/:movieId/reviews', getReviewsByMovieController); // Pública o protegida? Haz pública para detalle
+
+//poner like/dislike
+router.post('/reviews/:reviewId/like', authenticateJWT, likeReviewController); // Body { isLike: true/false }
+
+//comentarios de cada reviews
+router.post('/reviews/:reviewId/comments', authenticateJWT, [body('text').notEmpty()], addCommentController);
+
+// Admin: Update/Delete
+//actualizar review
+router.put('/reviews/:reviewId', authenticateJWT, isAdmin, [body('title').notEmpty()], updateReviewController);
+
+//eliminar review
+router.delete('/reviews/:reviewId', authenticateJWT, isAdmin, deleteReviewController);
 export default router;

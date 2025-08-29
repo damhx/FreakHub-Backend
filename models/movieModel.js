@@ -30,6 +30,10 @@ export const createMovie = async (movieData) => {
 };
 
 // Función para obtener todas las películas (con filtro opcional)
+export const getMoviesPending = async (/* filter = { status: 'aceptada' } */) => {
+  const db = await connectDB();
+  return await db.collection('peliculas').find({status: 'pendiente'}).toArray(); //solo peliculas aceptadas
+};
 export const getMovies = async (/* filter = { status: 'aceptada' } */) => {
   const db = await connectDB();
   return await db.collection('peliculas').find({status: 'aceptada'}).toArray(); //solo peliculas aceptadas
