@@ -5,9 +5,9 @@ import { ObjectId } from 'mongodb';
 export const createReview = async (reviewData) => {
   const db = await connectDB();
   const movieExists = await db.collection('peliculas').findOne({ _id: new ObjectId(reviewData.movieId) });
-const userExists = await db.collection('users').findOne({ _id: new ObjectId(reviewData.userId) });
-if (!movieExists) throw new Error('Película no encontrada');
-if (!userExists) throw new Error('Usuario no encontrado');
+  const userExists = await db.collection('users').findOne({ _id: new ObjectId(reviewData.userId) });
+  if (!movieExists) throw new Error('Película no encontrada');
+  if (!userExists) throw new Error('Usuario no encontrado');
   const session = db.client.startSession();
   try {
     console.log('Iniciando transacción para review:', reviewData);
@@ -30,8 +30,8 @@ if (!userExists) throw new Error('Usuario no encontrado');
     };
     console.log('Review a insertar:', review);
 
-    // Insertar la review y obtener el _id generado
-    const result = await db.collection('reviews').insertOne(review/* , { session } */);
+    // Insertar la review y obtener el _id generado (dentro de la transacción)
+    const result = await db.collection('reviews').insertOne(review, { session });
     console.log('Review insertada con ID:', result.insertedId);
 
     // Integración: Añadir referencia a usuario (historial)
@@ -42,17 +42,30 @@ if (!userExists) throw new Error('Usuario no encontrado');
     );
     console.log('Referencia añadida a usuario con ID:', reviewData.userId);
 
-    // Integración: Añadir referencia a película
+    // Integración: Añadir referencia a película y actualizar rating
     await db.collection('peliculas').updateOne(
       { _id: new ObjectId(reviewData.movieId) },
-      { $push: { reviews: result.insertedId } },
+      { 
+        $push: { reviews: result.insertedId },
+        $set: { updatedAt: new Date() } // Opcional, para registrar última actualización
+      },
       { session }
     );
     console.log('Referencia añadida a película con ID:', reviewData.movieId);
 
+    // Calcular y actualizar el rating global de la película
+    const reviews = await db.collection('reviews').find({ movieId: new ObjectId(reviewData.movieId) }).toArray();
+    const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+    const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
+    await db.collection('peliculas').updateOne(
+      { _id: new ObjectId(reviewData.movieId) },
+      { $set: { rating: avgRating } },
+      { session }
+    );
+    console.log('Rating actualizado a:', avgRating);
+
     await session.commitTransaction();
     console.log('Transacción commit exitosa');
-    // Retornar la review con el _id generado
     return { ...review, _id: result.insertedId };
   } catch (error) {
     console.error('Error en transacción:', error);
