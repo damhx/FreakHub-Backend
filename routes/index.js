@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login } from '../controllers/authController.js';
+import { register, login, verifyAccount } from '../controllers/authController.js'; // Agregué verifyAccount
 import { getProfile, updatePassword, addUserReview, addUserRating } from '../controllers/profileController.js';
 import { propose, approve, reject } from '../controllers/movieController.js';
 import { body } from 'express-validator';
@@ -21,6 +21,7 @@ router.post(
     }),
     body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
     body('username').notEmpty().withMessage('El nombre de usuario es requerido').isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres'),
+    body('role').optional().isIn(['admin', 'usuario']).withMessage('El rol debe ser "admin" o "usuario"'),
   ],
   register
 );
@@ -50,7 +51,6 @@ router.post('/profile/review', passport.authenticate('jwt', { session: false }),
 
 router.post('/profile/rating', passport.authenticate('jwt', { session: false }), addUserRating);
 
-// Nuevas rutas para películas
 router.post(
   '/movies',
   authenticateJWT,
@@ -74,5 +74,8 @@ router.post(
   isAdmin,
   reject
 );
+
+// Nueva ruta para verificación de cuenta
+router.get('/verify', verifyAccount);
 
 export default router;

@@ -9,7 +9,7 @@ export const register = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password, username } = req.body;
+  const { email, password, username, role } = req.body;
 
   const existingUser = await findUserByEmail(email);
   if (existingUser) {
@@ -21,7 +21,7 @@ export const register = async (req, res) => {
     email,
     password: hashedPassword,
     username,
-    role: 'usuario',
+    role: role === 'admin' ? 'admin' : 'usuario',
     createdAt: new Date(),
   };
 
@@ -49,6 +49,12 @@ export const login = async (req, res) => {
     return res.status(401).json({ message: 'Contraseña incorrecta' });
   }
 
-  const token = jwt.sign({ id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  res.json({ message: 'Inicio de sesión exitoso', token });
+  const token = jwt.sign({ sub: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+  res.json({ message: 'Inicio de sesión exitoso', token });
+};
+
+export const verifyAccount = async (req, res) => {
+  const { token } = req.query;
+
+  res.json({ message: 'Cuenta verificada exitosamente', token });
 };
