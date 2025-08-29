@@ -2,9 +2,14 @@ import { client } from '../config/db.js';
 import { ObjectId } from 'mongodb';
 
 export const createUser = async (userData) => {
-  const db = client.db('FreakHub');
+  const db = await connectDB();
   const usersCollection = db.collection('users');
-  return await usersCollection.insertOne(userData);
+  return await usersCollection.insertOne({
+    ...userData,
+    role: userData.role || 'usuario',
+    reviews: [], 
+    createdAt: new Date()
+  });
 };
 
 export const findUserByEmail = async (email) => {
