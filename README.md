@@ -304,6 +304,11 @@ Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para má
 ## Contacto
 
 Para preguntas o soporte, contacta a [tu-email@ejemplo.com](mailto:tu-email@ejemplo.com).
+
+## Trello
+
+https://trello.com/b/gWIttAVA/freak-hub
+
 ```
 
 ### Instrucciones
