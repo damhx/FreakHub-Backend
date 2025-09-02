@@ -24,9 +24,5 @@ FreakHub es una aplicación web diseñada para gestionar propuestas de película
 - Backend:
 <img width="236" height="574" alt="image" src="https://github.com/user-attachments/assets/055a2599-c90f-4716-89d2-b46bf48e8cdc" />
 
-
-## Endpoints
-(Documentación en progreso, ver `/api-docs` cuando esté listo)
-
 ## Frontend
-https://github.com/damhx/FreakHub-Frontend (en desarrollo)
+[https://github.com/damhx/FreakHub-Frontend (en desarrollo)](https://github.com/BreynerFernandoPintoCardenas13/FreakHubFrontend.git)
