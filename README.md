@@ -289,17 +289,10 @@ A continuación, se detalla cada ruta disponible en la API, incluyendo métodos 
     - `:reviewId` (string, ID de MongoDB).
   - **Respuesta exitosa**: `true`.
   - **Errores**: 404 (reseña no encontrada), 401 (no autorizado).
+ 
+## Frontend
 
-## Contribuciones
-
-1. Haz un fork del repositorio.
-2. Crea una rama para tu característica (`git checkout -b feature/nueva-caracteristica`).
-3. Realiza tus cambios y haz commit (`git commit -m 'Añadida nueva funcionalidad'`).
-4. Envía un pull request.
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+https://github.com/BreynerFernandoPintoCardenas13/FreakHubFrontend
 
 ## Trello
 
