@@ -304,12 +304,3 @@ Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para má
 ## Trello
 
 https://trello.com/b/gWIttAVA/freak-hub
-
-```
-
-### Instrucciones
-- Guarda este contenido en un archivo llamado `README.md` en la raíz de tu proyecto backend.
-- Asegúrate de reemplazar los placeholders como `tu-usuario`, `tu_base_de_datos`, `tu_secreto_jwt`, `tu-email@ejemplo.com`, etc., con los valores reales correspondientes a tu configuración.
-- Si hay más controladores o rutas que no están listados (ej. `getMoviesByTitleController`), asegúrate de implementarlos en `movieController.js` y `movieModel.js` para que coincidan con la documentación.
-
-Dime si necesitas ajustar algo o añadir más detalles. ¡Listo para el siguiente paso!
