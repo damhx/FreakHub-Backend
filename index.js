@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: 'http://127.0.0.1:5500',
+  origin: 'https://breynerfernandopintocardenas13.github.io',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }))
