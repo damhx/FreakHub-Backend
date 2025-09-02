@@ -2,13 +2,13 @@
 
 FreakHub es una aplicación web diseñada para gestionar propuestas de películas y perfiles de usuarios. Este proyecto backend, desarrollado con Node.js, Express y MongoDB Atlas, permite a los usuarios registrarse, proponer películas y a los administradores aprobar o rechazarlas, mientras ofrece autenticación segura con JWT. El frontend, construido con HTML, CSS y JavaScript puro, proporciona una interfaz sencilla y responsive.
 
-## Características Principales
+## 🚀 Características Principales
 - Registro y autenticación de usuarios con roles (admin/usuario).
 - Propuesta y gestión de películas con validación de título único.
 - API RESTful para interactuar con el backend.
 - Interfaz frontend adaptable con diseño centrado en la experiencia de usuario.
 
-## Tecnologías
+## 🛠️ Tecnologías
 - Node.js, Express, MongoDB (driver oficial)
 - JWT (jsonwebtoken, passport-jwt, bcrypt)
 - express-validator, express-rate-limit, dotenv, swagger-ui-express, cors
