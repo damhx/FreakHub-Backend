@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { createMovie, getMovies,getMoviesPending, getMovieById, updateMovie, deleteMovie, addReview, approveMovie } from '../models/movieModel.js';
+import { getMoviesByTitle, getMoviesByCategory,createMovie, getMovies,getMoviesPending, getMovieById, updateMovie, deleteMovie, addReview, approveMovie } from '../models/movieModel.js';
 import { uploadImage } from '../utils/cloudinary.js'; // Asumiendo que lo creaste
 import {categoryExists} from '../models/categoryModel.js'
 
@@ -131,3 +131,37 @@ export const approveMovieController = async (req, res) => {
     res.status(500).json({ message: 'Error aprobando película', error: error.message });
   }
 };
+export const getMoviesByCategoryController = async (req, res) => {
+  try {
+    const { category } = req.query; // Obtener categoría desde la query string
+    console.log(`Solicitud recibida para categoría: ${category}`); // Depuración
+    if (!category) {
+      return res.status(400).json({ message: 'Categoría es requerida' });
+    }
+    const movies = await getMoviesByCategory(category);
+    console.log(`Películas devueltas: ${movies.length}`); // Depuración
+    res.json(movies);
+  } catch (error) {
+    console.error('Error en getMoviesByCategoryController:', error.message);
+    res.status(500).json({ message: 'Error obteniendo películas', error: error.message });
+  }
+};
+
+export const getMoviesByTitleController = async (req, res) =>{
+  try{
+    const {title} =req.query
+    console.log(`se busca titulo: ${title}`);
+    if(!title){
+      return res.status(400).json({message: 'Error obteniendo peliculas',error: error.message})
+      }
+      const movies = await getMoviesByTitle(title);
+      console.log(`Peliculas devueltas: ${movies.length}`);
+      res.json(movies)
+    
+  }catch(error){
+    console.error("error en getMoviesByTitleController: ",  error.message);
+    res.status(500).json({ message: 'Error obteniendo películas', error: error.message });
+
+    
+  }
+}

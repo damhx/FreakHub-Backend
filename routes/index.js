@@ -17,7 +17,9 @@ import {
   deleteMovieController,
   addReviewController,
   getPendingMoviesController,
-  approveMovieController
+  approveMovieController,
+  getMoviesByCategoryController,
+  getMoviesByTitleController
 } from '../controllers/movieController.js';
 
 //import category
@@ -112,6 +114,11 @@ router.get('/movies/pending', authenticateJWT, isAdmin, getPendingMoviesControll
 
 //ruta para aprobar una pelicula(la idea es que en el frontEND solo se consuman las peliculas ocn el estado en aceptadas)
 router.put('/movies/:id/approve', authenticateJWT, isAdmin, approveMovieController);
+
+//ruta para listar movies por categoria:
+router.get('/movies/category', authenticateJWT, getMoviesByCategoryController);
+//ruta para listar por titulo
+router.get('/movies/title', authenticateJWT, getMoviesByTitleController);
 
 // Reseñas (protegidas)
 /* router.post('/movies/:id/reviews', authenticateJWT, [body('title').notEmpty(), body('comment').notEmpty(), body('rating').isInt({ min: 1, max: 10 })], addReviewController);

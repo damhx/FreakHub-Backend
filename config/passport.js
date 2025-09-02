@@ -14,7 +14,9 @@ const opts = {
 passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
   try {
     const db = await connectDB();
-    const user = await db.collection('users').findOne({ _id: new ObjectId(jwt_payload.id) });
+    // Convertir id a ObjectId si es string
+    const userId = typeof jwt_payload.id === 'string' ? new ObjectId(jwt_payload.id) : jwt_payload.id;
+    const user = await db.collection('users').findOne({ _id: userId });
     if (user) {
       return done(null, user);
     } else {
@@ -25,4 +27,4 @@ passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
   }
 }));
 
-export default passport;
+export default passport;

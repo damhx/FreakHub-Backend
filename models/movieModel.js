@@ -158,3 +158,41 @@ export const approveMovie = async (id) => {
     session.endSession();
   }
 };
+// Función para obtener películas por categoría
+export const getMoviesByCategory = async (category, status = 'aceptada') => {
+  const db = await connectDB();
+  const session = db.client.startSession();
+  try {
+    session.startTransaction();
+    console.log(`Filtrando películas con categoría: ${category}, status: ${status}`); // Depuración
+    const movies = await db.collection('peliculas').find({ category: category, status: status }).toArray({ session });
+    console.log(`Resultados encontrados: ${movies.length} películas`); // Depuración
+    await session.commitTransaction();
+    return movies;
+  } catch (error) {
+    await session.abortTransaction();
+    console.error('Error en getMoviesByCategory:', error.message);
+    throw new Error('Error obteniendo películas por categoría: ' + error.message);
+  } finally {
+    session.endSession();
+  }
+};
+
+  export const getMoviesByTitle = async (title, status = 'aceptada') =>{
+    const db = await connectDB();
+    const session = db.client.startSession();
+    try{
+      session.startTransaction();
+      console.log(`Filtrando peliculas con titulo: ${title}, status: ${status}`);
+      const movies = await db.collection('peliculas').find({title: title, status: status}).toArray({session});
+      console.log(`Resultados encontrados: ${movies.length} peliculas`);
+      await session.commitTransaction();
+      return movies;
+    }catch(error){
+      await session.abortTransaction();
+      console.error('Error en getMoviesByTitle', error.message);
+      throw new Error("error:" + error.message)
+    } finally{
+      session.endSession()
+    }
+  }

@@ -48,9 +48,8 @@ export const login = async (req, res) => {
   if (!isMatch) {
     return res.status(401).json({ message: 'Contraseña incorrecta' });
   }
-
-  const token = jwt.sign({ id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
-  res.json({ message: 'Inicio de sesión exitoso', token });
+  const token = jwt.sign({ id: user._id.toString(), name: user.name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+   res.json({ message: 'Inicio de sesión exitoso', token });
 };
 
 export const verifyAccount = async (req, res) => {

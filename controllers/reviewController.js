@@ -5,8 +5,22 @@ import {
   likeReview, 
   addComment, 
   updateReview, 
-  deleteReview 
+  deleteReview,
+  
 } from '../models/reviewModel.js';
+
+export const getMovieByIdController = async (req, res) => {
+  try {
+    const movie = await getMovieById(req.params.id);
+    if (!movie) return res.status(404).json({ message: 'Película no encontrada' });
+
+    const reviews = await getReviewsByMovie(req.params.id);
+
+    res.json({ ...movie, reviews });
+  } catch (error) {
+    res.status(500).json({ message: 'Error obteniendo película', error: error.message });
+  }
+};
 
 export const createReviewController = async (req, res) => {
   const errors = validationResult(req);
@@ -94,3 +108,4 @@ export const deleteReviewController = async (req, res) => {
     res.status(500).json({ message: 'Error eliminando review', error: error.message });
   }
 };
+
