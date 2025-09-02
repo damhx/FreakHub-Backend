@@ -301,10 +301,6 @@ A continuación, se detalla cada ruta disponible en la API, incluyendo métodos 
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
 
-## Contacto
-
-Para preguntas o soporte, contacta a [tu-email@ejemplo.com](mailto:tu-email@ejemplo.com).
-
 ## Trello
 
 https://trello.com/b/gWIttAVA/freak-hub
