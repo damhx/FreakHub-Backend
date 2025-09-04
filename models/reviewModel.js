@@ -233,3 +233,29 @@ export const createCSV = async (id) => {
     session.endSession()
   }
 }
+
+export const createNotification = async (id) => {
+  const db = await connectDB();
+  const session = db.client.startSession();
+  try {
+    session.startTransaction();
+    const review = {
+      userId: new ObjectId(userId),
+      text: commentData.text,
+      createdAt: new Date()
+    };
+    const result = await db.collection('reviews').updateOne(
+      { _id: new ObjectId(reviewId) },
+      { $set: { updatedAt: new Date() } },
+      { session }
+    );
+    await session.commitTransaction();
+    if (result.matchedCount === 0) throw new Error('Review no encontrada');
+    return comment;
+  } catch (error) {
+    await session.abortTransaction();
+    throw new Error('Error añadiendo notificacion: ' + error.message);
+  } finally {
+    session.endSession();
+  }
+};

@@ -6,7 +6,8 @@ import {
   addComment, 
   updateReview, 
   deleteReview,
-  createCSV
+  createCSV,
+  createNotification
 } from '../models/reviewModel.js';
 
 export const getMovieByIdController = async (req, res) => {
@@ -119,4 +120,13 @@ export const createCSVController = async (req, res) => {
     
   }
 
-}
+};
+
+export const createNotification = async (req, res) => {
+  try {
+    await createNotification(req.params.reviewId);
+    res.json({ message: 'Review creada exitosamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error eliminando review', error: error.message });
+  }
+};

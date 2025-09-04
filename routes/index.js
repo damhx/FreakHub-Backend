@@ -39,7 +39,8 @@ import {
   addCommentController, 
   updateReviewController, 
   deleteReviewController,
-  createCSVController
+  createCSVController,
+  createNotificationController
 } from '../controllers/reviewController.js';
 const router = express.Router();
 // rutas de login register y demas:
@@ -166,4 +167,5 @@ router.delete('/reviews/:reviewId', authenticateJWT, isAdmin, deleteReviewContro
 router.get('/reviews/CSV/:reviewId', authenticateJWT, isAdmin, createCSVController)
 export default router;
 // createCSVController
+
 
