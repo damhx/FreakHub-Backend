@@ -20,5 +20,5 @@ app.use('/api', router);
 
 (async () => {
   await connectDB();
-  app.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
+  app.listen(PORT, () => console.log(`Servidor en puerto http://localhost:${PORT}/api`));
 })();

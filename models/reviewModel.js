@@ -1,5 +1,7 @@
+import { selectFields } from 'express-validator/lib/field-selection.js';
 import { connectDB } from '../config/db.js';
 import { ObjectId } from 'mongodb';
+import fs from 'fs/promises'
 
 // Función para crear una nueva review
 export const createReview = async (reviewData) => {
@@ -45,7 +47,7 @@ export const createReview = async (reviewData) => {
     // Integración: Añadir referencia a película y actualizar rating
     await db.collection('peliculas').updateOne(
       { _id: new ObjectId(reviewData.movieId) },
-      { 
+      {
         $push: { reviews: result.insertedId },
         $set: { updatedAt: new Date() } // Opcional, para registrar última actualización
       },
@@ -198,3 +200,36 @@ export const deleteReview = async (id) => {
     session.endSession();
   }
 };
+
+export const createCSV = async (id) => {
+  const db = await connectDB();
+  const session = db.client.startSession();
+  try{
+    session.startTransaction();
+    // const movie = await db.collection('peliculas').findOne({_id: new ObjectId(id)})
+    // if(!movie) throw new Error('pelicula no encontrada cabeza verga')
+    const review = await db.collection('reviews').findOne({movieId: new ObjectId(id)})
+    if(!review) throw new Error('review no encontrada cabeza verga')
+
+
+    async function crearCSV(ruta, contenido) {
+        try{
+          await fs.writeFile(ruta, contenido)
+        }catch(error){
+          console.log("error");
+          
+        }
+        crearCSV("/exports/file.csv", `${review._id} \nTitulo:${review.title} \nDescripcion:${review.comment} \nRAting: ${review.rating}`)
+    }
+    crearCSV()
+    console.log(`Review encontada: ${review._id} \nTitulo:${review.title} \nDescripcion:${review.comment} \nRAting: ${review.rating}`);
+    await session.commitTransaction();
+    return true
+
+  }catch(error){
+    console.error('error creando CSV: '+ error.message);
+
+  }finally{
+    session.endSession()
+  }
+}

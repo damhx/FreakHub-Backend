@@ -6,7 +6,7 @@ import {
   addComment, 
   updateReview, 
   deleteReview,
-  
+  createCSV
 } from '../models/reviewModel.js';
 
 export const getMovieByIdController = async (req, res) => {
@@ -109,3 +109,14 @@ export const deleteReviewController = async (req, res) => {
   }
 };
 
+
+export const createCSVController = async (req, res) => {
+  try {
+    await createCSV(req.params.reviewId);
+    res.json({message: 'Review Obtenida exitosamente'})
+  } catch(error){
+    res.status(500).json({ message: 'error creando CSV', error: error.message });
+    
+  }
+
+}
