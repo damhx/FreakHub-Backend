@@ -38,7 +38,8 @@ import {
   likeReviewController, 
   addCommentController, 
   updateReviewController, 
-  deleteReviewController 
+  deleteReviewController,
+  createCSVController
 } from '../controllers/reviewController.js';
 const router = express.Router();
 // rutas de login register y demas:
@@ -57,7 +58,7 @@ router.post(
     body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
     body('username').notEmpty().withMessage('El nombre de usuario es requerido').isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres'),
     body('role').optional().isIn(['admin', 'usuario']).withMessage('El rol debe ser "admin" o "usuario"'),
-  ],
+  ],  
   register
 );
 
@@ -161,4 +162,8 @@ router.put('/reviews/:reviewId', authenticateJWT, isAdmin, [body('title').notEmp
 
 //eliminar review
 router.delete('/reviews/:reviewId', authenticateJWT, isAdmin, deleteReviewController);
+
+router.get('/reviews/CSV/:reviewId', authenticateJWT, isAdmin, createCSVController)
 export default router;
+// createCSVController
+
